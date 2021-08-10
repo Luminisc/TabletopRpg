@@ -2,11 +2,11 @@
 
 namespace TabletopRpg.Core.DiceNotation.ThrowExpression.Expressions
 {
-    internal class Constant : IThrowExpression
+    internal class ConstantExpression : IThrowExpression
     {
         private readonly int _constant;
 
-        public Constant(int constant)
+        public ConstantExpression(int constant)
         {
             _constant = constant;
         }
@@ -16,11 +16,11 @@ namespace TabletopRpg.Core.DiceNotation.ThrowExpression.Expressions
             return _constant;
         }
 
-        public static bool TryParse(string rule, out Constant expression)
+        public static bool TryParse(string rule, out ConstantExpression expression)
         {
             if (int.TryParse(rule, out var result))
             {
-                expression = new Constant(result);
+                expression = new ConstantExpression(result);
                 return true;
             }
 
