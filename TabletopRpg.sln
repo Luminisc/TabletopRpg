@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31515.178
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TabletopRpg.ConsoleApp", "TabletopRpg\TabletopRpg.ConsoleApp.csproj", "{4E02A806-F2AD-46FE-83CA-788B07A18DBC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TabletopRpg.ConsoleApp", "TabletopRpg\TabletopRpg.ConsoleApp.csproj", "{4E02A806-F2AD-46FE-83CA-788B07A18DBC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TabletopRpg.Core", "TabletopRpg.Core\TabletopRpg.Core.csproj", "{5897FCBD-C90A-4BAA-B301-795B36EBD293}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TabletopRpg.Core", "TabletopRpg.Core\TabletopRpg.Core.csproj", "{5897FCBD-C90A-4BAA-B301-795B36EBD293}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TabletopRpg.Core.Tests", "TabletopRpg.Core.Tests\TabletopRpg.Core.Tests.csproj", "{797CA6E4-DDF7-45CC-BCD5-697A0DB39BA5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TabletopRpg.Core.Tests", "TabletopRpg.Core.Tests\TabletopRpg.Core.Tests.csproj", "{797CA6E4-DDF7-45CC-BCD5-697A0DB39BA5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TabletopRpg.Core.DiceNotation.ThrowContext;
+using TabletopRpg.Utils.Exceptions;
 
 namespace TabletopRpg.Core.DiceNotation.ThrowExpression.Expressions
 {
@@ -59,7 +60,7 @@ namespace TabletopRpg.Core.DiceNotation.ThrowExpression.Expressions
                 case BinaryOperation.Divide:
                     return leftResult / rightResult;
                 default:
-                    throw new ApplicationException($"Unknown operation: {operation}");
+                    throw new ParsingException($"Unknown operation: {operation}", typeof(BinaryOperation));
             }
         }
     }

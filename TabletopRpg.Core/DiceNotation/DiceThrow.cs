@@ -5,11 +5,11 @@ namespace TabletopRpg.Core.DiceNotation
 {
     public class DiceThrow
     {
-        IThrowExpression throwExpression; 
+        private readonly IThrowExpression throwExpression; 
 
         public DiceThrow(string rule)
         {
-            throwExpression = ThrowRuleParser.ThrowRuleParser.ParseRule(rule);
+            throwExpression = ThrowRuleParser.ThrowRuleParserV0.ParseRule(rule);
         }
 
         /// <summary>Returns result of dice throw</summary>

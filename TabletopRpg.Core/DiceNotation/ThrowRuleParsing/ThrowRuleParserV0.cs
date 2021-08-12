@@ -1,8 +1,8 @@
 ﻿using System;
-using System.IO;
 using System.Linq;
 using TabletopRpg.Core.DiceNotation.ThrowExpression;
 using TabletopRpg.Core.DiceNotation.ThrowExpression.Expressions;
+using TabletopRpg.Utils.Exceptions;
 
 // testing phrases:
 
@@ -18,19 +18,18 @@ using TabletopRpg.Core.DiceNotation.ThrowExpression.Expressions;
 
 namespace TabletopRpg.Core.DiceNotation.ThrowRuleParser
 {
-    internal class ThrowRuleParser
+    internal class ThrowRuleParserV0
     {
         static readonly char[] _visualDelimeters = new char[] { ' ' };
-        static readonly char[] _bracketsCharacters = new char[] { '(', ')' };
 
         static readonly char[] _skippableDelimeters = _visualDelimeters
             .Concat(BinaryOperationExpression._operationsDelimeters)
-            .Concat(_bracketsCharacters)
+            .Concat(BracketExpression._bracketsCharacters)
             .ToArray();
 
         public static IThrowExpression ParseRule(string rule)
         {
-            var parser = new ThrowRuleParser();
+            var parser = new ThrowRuleParserV0();
             return parser.ParseRuleInternal(rule.ToLower());
         }
 
@@ -42,7 +41,6 @@ namespace TabletopRpg.Core.DiceNotation.ThrowRuleParser
             var reading = false;
             IThrowExpression leftExpr = null;
             BinaryOperation? operation = null;
-            IThrowExpression rightExpr = null;
 
             while (pos < rule.Length)
             {
@@ -54,13 +52,17 @@ namespace TabletopRpg.Core.DiceNotation.ThrowRuleParser
                 }
 
                 reading = true;
-                var couldBeOperation = bufferPos == 1; // if only one character was read, this might be a operation (+ - * /)
-                if (couldBeOperation && BinaryOperationExpression.TryParseOperation(new string(buffer, 0, bufferPos), out var binaryOperation))
+
+                var currentChar = rule[pos - 1];
+                var nextChar = pos < rule.Length ? rule[pos] : ' ';
+                var couldBeOperationOrBracketToken = bufferPos == 1; // if only one character was read, this might be a operation (+ - * /)
+
+                if (couldBeOperationOrBracketToken && BinaryOperationExpression.TryParseOperation(new string(buffer, 0, bufferPos), out var binaryOperation))
                 {
                     operation = binaryOperation;
                     if (leftExpr != null)
                     {
-                        rightExpr = ParseRuleInternal(rule.Substring(pos));
+                        var rightExpr = ParseRuleInternal(rule[pos..]);
                         leftExpr = new BinaryOperationExpression(leftExpr, rightExpr, operation.Value);
                         return leftExpr;
                     }
@@ -71,20 +73,39 @@ namespace TabletopRpg.Core.DiceNotation.ThrowRuleParser
                     continue;
                 }
 
-                var nextChar = pos < rule.Length ? rule[pos] : ' ';
+                //if (couldBeOperationOrBracketToken && BracketExpression.IsExpressionStart(currentChar))
+                //{
+                //    var closingBracketIndex = BracketExpression.GetClosingBracketIndex(rule, pos - 1);
+                //    if (closingBracketIndex < 0)
+                //        throw new ParsingException("Unable to find closing bracket", typeof(BracketExpression));
+
+                //    if (leftExpr == null)
+                //    {
+                //        var bracketInnerExpression = ParseRuleInternal(rule[pos..(closingBracketIndex)]);
+                //        leftExpr = new BracketExpression(bracketInnerExpression);
+                //        pos = closingBracketIndex + 1;
+
+                //        // reset reader
+                //        reading = false;
+                //        bufferPos = 0;
+                //        continue;
+                //    }
+                //    else
+                //        throw new InvalidOperationException("Parsed new expression, but without operation"); // (1+1)(2+2)
+                //}
 
                 if (_skippableDelimeters.Contains(nextChar))
                 {
-                    // try guess
+                    // trying to parse what was read
                     var str = new string(buffer, 0, bufferPos);
                     var parsedExpression = TryParse(str);
                     if (parsedExpression == null)
-                        throw new ArgumentException($"Unable to parse following expression: {str}");
+                        throw new ParsingException($"Unable to parse following expression: {str}");
 
                     if (leftExpr == null)
                         leftExpr = parsedExpression;
                     else
-                        rightExpr = ParseRule(rule.Substring(pos));
+                        throw new InvalidOperationException("Parsed new expression, but without operation"); // (1+1)(2+2)
 
                     if (operation.HasValue)
                     {
@@ -100,7 +121,7 @@ namespace TabletopRpg.Core.DiceNotation.ThrowRuleParser
             }
 
             if (reading)
-                throw new ArgumentException("No proper ending of expression");
+                throw new ParsingException("No proper ending of expression");
 
             return leftExpr;
         }
