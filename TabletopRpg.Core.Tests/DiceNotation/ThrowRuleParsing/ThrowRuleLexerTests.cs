@@ -29,9 +29,23 @@ namespace TabletopRpg.Core.Tests.DiceNotation.ThrowRuleParsing
 
         public static IEnumerable<object[]> GetTokenizeTestCases()
         {
+            static TokenExpectation te(TokenType expectedType, string expectedValue = null) => new(expectedType, expectedValue);
+
             var testCases = new List<object[]>
             {
-                new object[] { "5", ExpectValues(new TokenExpectation(TokenType.Digit, "5")) }
+                new object[] { "5", ExpectValues(te(TokenType.Digit, "5")) },
+                new object[] { "5+3", ExpectValues(te(TokenType.Digit, "5"), te(TokenType.Plus, "+"), te(TokenType.Digit, "3")) },
+                new object[] { "5 + 3", ExpectValues(te(TokenType.Digit, "5"), te(TokenType.Whitespace), te(TokenType.Plus, "+"), te(TokenType.Whitespace, null), te(TokenType.Digit, "3")) },
+                new object[] { "2d6", ExpectValues(te(TokenType.DiceThrow, "2d6")) },
+                new object[] { "3d8-5", ExpectValues(te(TokenType.DiceThrow, "3d8"), te(TokenType.Minus, "-"), te(TokenType.Digit, "5")) },
+                new object[] { 
+                    "3d8-(5-3)*STR", 
+                    ExpectValues(
+                        te(TokenType.DiceThrow, "3d8"), te(TokenType.Minus, "-"), 
+                        te(TokenType.OpenParenthesis, "("), te(TokenType.Digit, "5"), te(TokenType.Minus, "-"), te(TokenType.Digit, "3"), te(TokenType.CloseParenthesis, ")"),
+                        te(TokenType.Multiply, "*"), te(TokenType.StringLiteral, "STR")
+                    )
+                }
             };
 
             return testCases;
